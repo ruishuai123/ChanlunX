@@ -1,0 +1,29 @@
+name: Build ChanlunX DLL
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ master, main ]
+
+jobs:
+  build:
+    runs-on: windows-latest
+    strategy:
+      matrix:
+        arch: [Win32, x64]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Configure CMake (${{ matrix.arch }})
+        run: cmake -B build -A ${{ matrix.arch }}
+
+      - name: Build Release (${{ matrix.arch }})
+        run: cmake --build build --config Release
+
+      - name: Upload ChanlunX.dll (${{ matrix.arch }})
+        uses: actions/upload-artifact@v4
+        with:
+          name: ChanlunX-${{ matrix.arch }}
+          path: build/**/ChanlunX.dll
